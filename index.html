@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KTMV School Library Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            50: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Styles for Scrollbars and Animations -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="h-full overflow-hidden text-slate-800 flex flex-col">
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- ========================================== -->
+    <!-- LOGIN PAGE VIEW -->
+    <!-- ========================================== -->
+    <div id="login-screen" class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900 overflow-hidden">
+        <!-- Abstract Background Shapes -->
+        <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-indigo-600/20 blur-3xl"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-violet-600/20 blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary-600/10 blur-3xl"></div>
+
+        <div class="w-full max-w-md p-6 relative z-10">
+            <!-- Logo/Branding -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center p-3 bg-gradient-to-tr from-indigo-600 to-violet-600 text-white rounded-2xl shadow-lg shadow-indigo-500/30 mb-4 ring-8 ring-indigo-500/10">
+                    <i data-lucide="library" class="w-8 h-8"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white">KTMV School</h1>
+                <p class="text-indigo-200 mt-1.5 text-sm font-medium uppercase tracking-wider">Library Management System</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="bg-slate-800/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-8 shadow-2xl shadow-black/40">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-white">Admin Login</h2>
+                    <p class="text-slate-400 text-sm mt-1">Access control for librarians & admin staff.</p>
+                </div>
+
+                <form id="login-form" class="space-y-5" onsubmit="app.handleLogin(event)">
+                    <div>
+                        <label for="login-id" class="block text-sm font-semibold text-slate-300 mb-1.5">Admin ID</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                <i data-lucide="user" class="w-4.5 h-4.5"></i>
+                            </span>
+                            <input type="text" id="login-id" required
+                                class="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm font-medium"
+                                placeholder="Enter Admin ID">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label for="login-password" class="block text-sm font-semibold text-slate-300">Password</label>
+                            <span class="text-xs text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer" onclick="app.showCredentialsTip()">Forgot password?</span>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                <i data-lucide="lock" class="w-4.5 h-4.5"></i>
+                            </span>
+                            <input type="password" id="login-password" required
+                                class="w-full pl-10 pr-10 py-3 bg-slate-900/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm font-medium"
+                                placeholder="••••••••">
+                            <button type="button" onclick="app.togglePasswordVisibility('login-password', this)" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors">
+                                <i data-lucide="eye" class="w-4.5 h-4.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input id="remember-me" type="checkbox" checked
+                            class="h-4 w-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/50 accent-indigo-600">
+                        <label for="remember-me" class="ml-2 block text-sm text-slate-300 font-medium select-none">Remember my session</label>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/20 active:translate-y-[1px] transition-all flex items-center justify-center gap-2 mt-2">
+                        <span>Sign In</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-5 border-t border-slate-700/50 text-center">
+                    <p class="text-xs text-slate-400">
+                        Default ID: <span class="text-indigo-400 font-bold bg-slate-900/60 px-1.5 py-0.5 rounded select-all">KTMV</span> | Password: <span class="text-indigo-400 font-bold bg-slate-900/60 px-1.5 py-0.5 rounded select-all">admin123</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MAIN APPLICATION WORKSPACE -->
+    <!-- ========================================== -->
+    <div id="app-workspace" class="hidden h-full flex overflow-hidden">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col flex-shrink-0 z-30 transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:relative -translate-x-full h-full" id="mobile-sidebar">
+            <!-- Sidebar Header -->
+            <div class="h-16 px-6 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-1.5 bg-gradient-to-tr from-indigo-500 to-violet-500 rounded-lg text-white">
+                        <i data-lucide="library" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-md font-extrabold text-white leading-none">KTMV Library</h2>
+                        <span class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Librarian Panel</span>
+                    </div>
+                </div>
+                <!-- Mobile sidebar close button -->
+                <button class="md:hidden text-slate-400 hover:text-white p-1" onclick="app.toggleSidebar()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Profile Widget -->
+            <div class="p-4 mx-3 my-4 bg-slate-800/40 rounded-2xl border border-slate-800/80 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center font-bold text-white text-md shadow-md">
+                    KM
+                </div>
+                <div class="overflow-hidden">
+                    <h4 class="text-sm font-bold text-white leading-tight truncate">KTMV Admin</h4>
+                    <p class="text-xs text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Active Session
+                    </p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+                <a href="#" onclick="app.switchTab('dashboard')" id="nav-dashboard"
+                    class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" onclick="app.switchTab('books')" id="nav-books"
+                    class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    <span>Book Inventory</span>
+                </a>
+                <a href="#" onclick="app.switchTab('members')" id="nav-members"
+                    class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Member Registry</span>
+                </a>
+                <a href="#" onclick="app.switchTab('borrow')" id="nav-borrow"
+                    class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+                    <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                    <span>Borrow & Return</span>
+                </a>
+            </nav>
+
+            <!-- Bottom Menu / Logout -->
+            <div class="p-4 border-t border-slate-800">
+                <button onclick="app.handleLogout()"
+                    class="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Log Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay (for mobile screens) -->
+        <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-20 hidden md:hidden transition-opacity" id="sidebar-overlay" onclick="app.toggleSidebar()"></div>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50 relative">
+            
+            <!-- HEADER -->
+            <header class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 z-10 flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Sidebar Toggle -->
+                    <button class="md:hidden text-slate-600 hover:text-slate-900 hover:bg-slate-100 p-1.5 rounded-lg transition-colors" onclick="app.toggleSidebar()">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    <!-- Current Page title -->
+                    <h1 class="text-xl font-extrabold text-slate-900 tracking-tight" id="header-title">Dashboard</h1>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <!-- Live Clock -->
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-100 text-slate-600 px-3 py-1.5 rounded-xl font-semibold text-xs border border-slate-200">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-500"></i>
+                        <span id="live-time">Sunday, May 24, 2026</span>
+                    </div>
+
+                    <div class="h-8 w-[1px] bg-slate-200 hidden sm:block"></div>
+
+                    <!-- User Pill -->
+                    <div class="flex items-center gap-2.5">
+                        <div class="text-right hidden xs:block">
+                            <span class="block text-xs font-bold text-slate-800 leading-none">Admin Official</span>
+                            <span class="text-[10px] text-slate-400 font-semibold uppercase leading-tight">School Librarian</span>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-sm">
+                            KM
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB VIEWS WRAPPER -->
+            <div class="flex-1 overflow-y-auto p-6 focus:outline-none relative" id="tab-content-wrapper">
+                
+                <!-- ========================================== -->
+                <!-- 1. DASHBOARD VIEW -->
+                <!-- ========================================== -->
+                <div id="tab-dashboard" class="tab-view space-y-6 animate-fade-in hidden">
+                    <!-- Top Notification banner -->
+                    <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl p-6 text-white shadow-xl shadow-indigo-500/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+                        <div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-white/10 blur-xl"></div>
+                        <div class="space-y-1.5 relative z-10">
+                            <h2 class="text-2xl font-bold">Welcome back, Admin! 👋</h2>
+                            <p class="text-indigo-100 font-medium text-sm max-w-xl">
+                                Welcome to the KTMV School Library Administration Console. Monitor book circulations, registers, and easily manage checkouts.
+                            </p>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0 relative z-10">
+                            <button onclick="app.switchTab('borrow')" class="bg-white text-indigo-600 px-4 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-slate-50 active:scale-95 transition-all flex items-center gap-2">
+                                <i data-lucide="plus" class="w-4.5 h-4.5"></i>
+                                New Issue
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STATISTICS WIDGETS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <!-- Stat Card 1 -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between group hover:shadow-md hover:border-indigo-200 transition-all duration-300">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Books</span>
+                                <h3 class="text-3xl font-extrabold text-slate-900" id="stat-total-books">0</h3>
+                                <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1 mt-1">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i> Fully Catalogued
+                                </span>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+                                <i data-lucide="book" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 2 -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between group hover:shadow-md hover:border-violet-200 transition-all duration-300">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Members</span>
+                                <h3 class="text-3xl font-extrabold text-slate-900" id="stat-total-members">0</h3>
+                                <span class="text-xs text-violet-600 font-semibold flex items-center gap-1 mt-1">
+                                    <i data-lucide="user-check" class="w-3.5 h-3.5"></i> Registered Readers
+                                </span>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-violet-50 text-violet-500 flex items-center justify-center group-hover:bg-violet-500 group-hover:text-white transition-all duration-300">
+                                <i data-lucide="users" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 3 -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between group hover:shadow-md hover:border-amber-200 transition-all duration-300">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Active Borrows</span>
+                                <h3 class="text-3xl font-extrabold text-slate-900" id="stat-total-borrowed">0</h3>
+                                <span class="text-xs text-amber-600 font-semibold flex items-center gap-1 mt-1" id="stat-borrowed-subtitle">
+                                    <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i> Currently Lent Out
+                                </span>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
+                                <i data-lucide="bookmark" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 4 -->
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between group hover:shadow-md hover:border-rose-200 transition-all duration-300">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Overdue Books</span>
+                                <h3 class="text-3xl font-extrabold text-slate-900 text-rose-600" id="stat-total-overdue">0</h3>
+                                <span class="text-xs text-rose-600 font-semibold flex items-center gap-1 mt-1" id="stat-overdue-subtitle">
+                                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Return Action Required
+                                </span>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DUAL COLUMN LAYOUT -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Left Panel: Library Activities -->
+                        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm lg:col-span-2 flex flex-col">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="activity" class="w-5 h-5 text-indigo-500"></i>
+                                    <h3 class="text-lg font-bold text-slate-900">Recent Circulation Activity</h3>
+                                </div>
+                                <span class="text-xs text-slate-400 font-semibold">Live updates</span>
+                            </div>
+                            <div class="flex-1 mt-4 overflow-y-auto max-h-[300px] divide-y divide-slate-100 pr-2" id="recent-activities-list">
+                                <!-- Dynamic items inject here -->
+                                <div class="text-center py-8 text-slate-400 text-sm">No activity recorded yet.</div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Distribution and Quick Actions -->
+                        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <div class="pb-4 border-b border-slate-100 flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-5 h-5 text-indigo-500"></i>
+                                    <h3 class="text-lg font-bold text-slate-900">Librarian Operations</h3>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 mt-4">
+                                    <button onclick="app.openAddBookQuickly()" class="p-3.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-100 hover:border-indigo-200 rounded-xl flex flex-col items-center justify-center text-center gap-1.5 transition-all duration-200 select-none">
+                                        <i data-lucide="plus-circle" class="w-5.5 h-5.5"></i>
+                                        <span class="text-xs font-bold leading-none mt-1">Catalog Book</span>
+                                    </button>
+                                    <button onclick="app.openRegisterMemberQuickly()" class="p-3.5 bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-100 hover:border-violet-200 rounded-xl flex flex-col items-center justify-center text-center gap-1.5 transition-all duration-200 select-none">
+                                        <i data-lucide="user-plus" class="w-5.5 h-5.5"></i>
+                                        <span class="text-xs font-bold leading-none mt-1">Register Member</span>
+                                    </button>
+                                    <button onclick="app.switchTab('borrow')" class="p-3.5 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-100 hover:border-amber-200 rounded-xl flex flex-col items-center justify-center text-center gap-1.5 transition-all duration-200 select-none col-span-2">
+                                        <i data-lucide="arrow-left-right" class="w-5.5 h-5.5"></i>
+                                        <span class="text-xs font-bold leading-none mt-1">Lend & Return Books</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-5 border-t border-slate-100">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Book Stock Meter</h4>
+                                    <span class="text-xs font-bold text-slate-600" id="stock-utilization-text">0/0 books available</span>
+                                </div>
+                                <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 p-0.5">
+                                    <div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full" id="stock-utilization-bar" style="width: 0%"></div>
+                                </div>
+                                <p class="text-[11px] text-slate-400 font-semibold mt-2.5">Provides a bird's eye view of actual available books vs. physical assets.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- ========================================== -->
+                <!-- 2. BOOK MANAGEMENT VIEW -->
+                <!-- ========================================== -->
+                <div id="tab-books" class="tab-view space-y-6 animate-fade-in hidden">
+                    
+                    <!-- View Layout -->
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        
+                        <!-- Catalog form panel (1 part) -->
+                        <div class="xl:col-span-1">
+                            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sticky top-6">
+                                <div class="flex items-center gap-2 pb-4 border-b border-slate-100 mb-5">
+                                    <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-500"></i>
+                                    <h3 class="text-lg font-bold text-slate-900" id="book-form-title">Catalog New Book</h3>
+                                </div>
+
+                                <form id="book-form" class="space-y-4" onsubmit="app.handleBookSubmit(event)">
+                                    <input type="hidden" id="book-edit-index" value="-1">
+                                    
+                                    <div>
+                                        <label for="book-title" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Book Title</label>
+                                        <input type="text" id="book-title" required
+                                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                            placeholder="The Great Gatsby">
+                                    </div>
+
+                                    <div>
+                                        <label for="book-author" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Author Name</label>
+                                        <input type="text" id="book-author" required
+                                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                            placeholder="F. Scott Fitzgerald">
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="book-isbn" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">ISBN Code</label>
+                                            <input type="text" id="book-isbn" required
+                                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                                placeholder="978-0743">
+                                        </div>
+                                        <div>
+                                            <label for="book-category" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Category / Genre</label>
+                                            <select id="book-category" required
+                                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium">
+                                                <option value="" disabled selected>Select category</option>
+                                                <option value="Fiction">Fiction</option>
+                                                <option value="Literature">Literature</option>
+                                                <option value="Science">Science</option>
+                                                <option value="History">History</option>
+                                                <option value="Biography">Biography</option>
+                                                <option value="Technology">Technology</option>
+                                                <option value="Philosophy">Philosophy</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="book-stock" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total Stock</label>
+                                            <input type="number" id="book-stock" required min="1" max="100" value="3"
+                                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                                placeholder="1">
+                                        </div>
+                                        <div>
+                                            <label for="book-shelf" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Shelf Location</label>
+                                            <input type="text" id="book-shelf" required
+                                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                                placeholder="Shelf A-3">
+                                        </div>
+                                    </div>
+
+                                    <div class="flex gap-2 pt-2">
+                                        <button type="submit" id="book-btn-submit"
+                                            class="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-md shadow-indigo-600/10 active:translate-y-[1px] transition-all text-sm">
+                                            Save Book
+                                        </button>
+                                        <button type="button" onclick="app.resetBookForm()" id="book-btn-cancel" class="hidden py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl active:translate-y-[1px] transition-all text-sm">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Book Table panel (2 parts) -->
+                        <div class="xl:col-span-2 space-y-4">
+                            <!-- Filter & Search Panel -->
+                            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm flex flex-col md:flex-row items-center gap-4">
+                                <div class="relative flex-1 w-full">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                        <i data-lucide="search" class="w-4.5 h-4.5"></i>
+                                    </span>
+                                    <input type="text" id="book-search" oninput="app.renderBooksTable()"
+                                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                        placeholder="Search by title, author, or ISBN...">
+                                </div>
+                                <div class="w-full md:w-48 flex-shrink-0">
+                                    <select id="book-filter-category" onchange="app.renderBooksTable()"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm font-medium">
+                                        <option value="ALL">All Genres</option>
+                                        <option value="Fiction">Fiction</option>
+                                        <option value="Literature">Literature</option>
+                                        <option value="Science">Science</option>
+                                        <option value="History">History</option>
+                                        <option value="Biography">Biography</option>
+                                        <option value="Philosophy">Philosophy</option>
+                                        <option value="Technology">Technology</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Table Container -->
+                            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr class="bg-slate-50 border-b border-slate-100">
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Book Information</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">ISBN</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Genre</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Status / Stock</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100" id="books-table-body">
+                                            <!-- Dynamic rows injection -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="books-table-empty" class="hidden py-12 text-center text-slate-400 text-sm font-medium">
+                                    <i data-lucide="folder-open" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i>
+                                    No books found matching criteria.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- ========================================== -->
+                <!-- 3. MEMBER REGISTRY VIEW -->
+                <!-- ========================================== -->
+                <div id="tab-members" class="tab-view space-y-6 animate-fade-in hidden">
+                    
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        
+                        <!-- Register member form (1 part) -->
+                        <div class="xl:col-span-1">
+                            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sticky top-6">
+                                <div class="flex items-center gap-2 pb-4 border-b border-slate-100 mb-5">
+                                    <i data-lucide="user-plus" class="w-5 h-5 text-indigo-500"></i>
+                                    <h3 class="text-lg font-bold text-slate-900" id="member-form-title">Register Member</h3>
+                                </div>
+
+                                <form id="member-form" class="space-y-4" onsubmit="app.handleMemberSubmit(event)">
+                                    <input type="hidden" id="member-edit-index" value="-1">
+
+                                    <div>
+                                        <label for="member-name" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Full Name</label>
+                                        <input type="text" id="member-name" required
+                                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                            placeholder="Alex Johnson">
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="member-id" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Member ID</label>
+                                            <input type="text" id="member-id" required
+                                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                                placeholder="MEMBER-101">
+                                        </div>
+                                        <div>
+                                            <label for="member-class" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Grade / Class</label>
+                                            <input type="text" id="member-class" required
+                                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                                placeholder="10th Grade">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label for="member-email" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email Address</label>
+                                        <input type="email" id="member-email" required
+                                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                            placeholder="alex@ktmv.edu">
+                                    </div>
+
+                                    <div>
+                                        <label for="member-phone" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Phone Number</label>
+                                        <input type="tel" id="member-phone" required
+                                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                            placeholder="+1 (555) 123-4567">
+                                    </div>
+
+                                    <div class="flex gap-2 pt-2">
+                                        <button type="submit" id="member-btn-submit"
+                                            class="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-md shadow-indigo-600/10 active:translate-y-[1px] transition-all text-sm">
+                                            Register Member
+                                        </button>
+                                        <button type="button" onclick="app.resetMemberForm()" id="member-btn-cancel" class="hidden py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl active:translate-y-[1px] transition-all text-sm">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Members Table panel (2 parts) -->
+                        <div class="xl:col-span-2 space-y-4">
+                            <!-- Filter & Search Panel -->
+                            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm flex flex-col md:flex-row items-center gap-4">
+                                <div class="relative flex-1 w-full">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                        <i data-lucide="search" class="w-4.5 h-4.5"></i>
+                                    </span>
+                                    <input type="text" id="member-search" oninput="app.renderMembersTable()"
+                                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                        placeholder="Search by name, email, or Member ID...">
+                                </div>
+                            </div>
+
+                            <!-- Table Container -->
+                            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr class="bg-slate-50 border-b border-slate-100">
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Member Details</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">ID Code</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Grade</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Active Loans</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100" id="members-table-body">
+                                            <!-- Dynamic rows injection -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="members-table-empty" class="hidden py-12 text-center text-slate-400 text-sm font-medium">
+                                    <i data-lucide="users-2" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i>
+                                    No members registered under criteria.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- ========================================== -->
+                <!-- 4. BORROW & RETURN VIEW -->
+                <!-- ========================================== -->
+                <div id="tab-borrow" class="tab-view space-y-6 animate-fade-in hidden">
+                    
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        
+                        <!-- New issue checkout (1 part) -->
+                        <div class="xl:col-span-1">
+                            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sticky top-6">
+                                <div class="flex items-center gap-2 pb-4 border-b border-slate-100 mb-5">
+                                    <i data-lucide="arrow-left-right" class="w-5 h-5 text-indigo-500"></i>
+                                    <h3 class="text-lg font-bold text-slate-900">New Book Issue</h3>
+                                </div>
+
+                                <form id="borrow-form" class="space-y-4" onsubmit="app.handleBorrowSubmit(event)">
+                                    
+                                    <div>
+                                        <label for="borrow-member-id" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Member</label>
+                                        <select id="borrow-member-id" required
+                                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium">
+                                            <option value="" disabled selected>Select a registered member</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label for="borrow-book-isbn" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Book</label>
+                                        <select id="borrow-book-isbn" required
+                                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium">
+                                            <option value="" disabled selected>Select an available book</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="borrow-date" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Issue Date</label>
+                                            <input type="date" id="borrow-date" required
+                                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium">
+                                        </div>
+                                        <div>
+                                            <label for="borrow-due-date" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Due Date</label>
+                                            <input type="date" id="borrow-due-date" required
+                                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium">
+                                        </div>
+                                    </div>
+
+                                    <button type="submit"
+                                        class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-md shadow-indigo-600/10 active:translate-y-[1px] transition-all text-sm mt-2 flex items-center justify-center gap-2">
+                                        <i data-lucide="check-circle-2" class="w-4.5 h-4.5"></i>
+                                        Lend Book
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Borrowing register (2 parts) -->
+                        <div class="xl:col-span-2 space-y-4">
+                            <!-- Filters -->
+                            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm flex flex-col md:flex-row items-center gap-4">
+                                <div class="relative flex-1 w-full">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                        <i data-lucide="search" class="w-4.5 h-4.5"></i>
+                                    </span>
+                                    <input type="text" id="borrow-search" oninput="app.renderBorrowTable()"
+                                        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium"
+                                        placeholder="Search by member name, ID, or book title...">
+                                </div>
+                                <div class="w-full md:w-48 flex-shrink-0">
+                                    <select id="borrow-filter-status" onchange="app.renderBorrowTable()"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm font-medium">
+                                        <option value="ALL">All Transactions</option>
+                                        <option value="BORROWED">Active Loan</option>
+                                        <option value="RETURNED">Returned</option>
+                                        <option value="OVERDUE">Overdue Alert</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Table Container -->
+                            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr class="bg-slate-50 border-b border-slate-100">
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Book Details</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Borrowed By</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Borrow / Due Date</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Status</th>
+                                                <th class="py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100" id="borrow-table-body">
+                                            <!-- Dynamic rows injection -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="borrow-table-empty" class="hidden py-12 text-center text-slate-400 text-sm font-medium">
+                                    <i data-lucide="history" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i>
+                                    No records found matching filters.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT SYSTEM ENGINE -->
+    <!-- ========================================== -->
+    <script>
+        class LibrarySystem {
+            constructor() {
+                this.adminCredentials = { id: 'KTMV', pw: 'admin123' };
+                this.isLoggedIn = false;
+                this.currentTab = 'dashboard';
+                
+                // Initialize datasets from localStorage or seed fallback
+                this.books = JSON.parse(localStorage.getItem('library_books')) || [];
+                this.members = JSON.parse(localStorage.getItem('library_members')) || [];
+                this.borrows = JSON.parse(localStorage.getItem('library_borrows')) || [];
+                this.activities = JSON.parse(localStorage.getItem('library_activities')) || [];
+
+                if (this.books.length === 0 && this.members.length === 0) {
+                    this.seedDatabase();
+                }
+
+                // Check persistent session
+                const session = localStorage.getItem('library_admin_session');
+                if (session === 'true') {
+                    this.isLoggedIn = true;
+                }
+            }
+
+            init() {
+                // Initialize clock
+                this.startClock();
+                
+                // Update UI based on initial session
+                if (this.isLoggedIn) {
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-workspace').classList.remove('hidden');
+                    this.switchTab('dashboard');
+                    this.showToast('success', 'Logged in automatically from remembered session.');
+                } else {
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('app-workspace').classList.add('hidden');
+                    lucide.createIcons();
+                }
+            }
+
+            startClock() {
+                const clockEl = document.getElementById('live-time');
+                const updateTime = () => {
+                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const now = new Date();
+                    
+                    const day = days[now.getDay()];
+                    const date = now.getDate();
+                    const month = months[now.getMonth()];
+                    const year = now.getFullYear();
+                    
+                    let hours = now.getHours();
+                    let minutes = now.getMinutes();
+                    let seconds = now.getSeconds();
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12; // hour '0' should be '12'
+                    minutes = minutes < 10 ? '0' + minutes : minutes;
+                    seconds = seconds < 10 ? '0' + seconds : seconds;
+                    
+                    clockEl.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-500"></i> ${day}, ${month} ${date}, ${year} • ${hours}:${minutes}:${seconds} ${ampm}`;
+                    lucide.createIcons();
+                };
+                updateTime();
+                setInterval(updateTime, 1000);
+            }
+
+            // Database Seeding with placeholder dummy values
+            seedDatabase() {
+                this.books = [
+                    { title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', isbn: '978-0743273565', category: 'Fiction', totalStock: 5, availableStock: 4, shelf: 'A-2' },
+                    { title: 'To Kill a Mockingbird', author: 'Harper Lee', isbn: '978-0446310789', category: 'Literature', totalStock: 4, availableStock: 3, shelf: 'B-1' },
+                    { title: '1984 (Classic)', author: 'George Orwell', isbn: '978-0451524935', category: 'Philosophy', totalStock: 6, availableStock: 5, shelf: 'C-3' },
+                    { title: 'Brief Answers to the Big Questions', author: 'Stephen Hawking', isbn: '978-1473560123', category: 'Science', totalStock: 3, availableStock: 3, shelf: 'E-1' },
+                    { title: 'A Brief History of Time', author: 'Stephen Hawking', isbn: '978-0553380163', category: 'Science', totalStock: 3, availableStock: 2, shelf: 'E-2' },
+                    { title: 'The Diary of a Young Girl', author: 'Anne Frank', isbn: '978-0307594006', category: 'Biography', totalStock: 2, availableStock: 1, shelf: 'D-1' }
+                ];
+
+                this.members = [
+                    { name: 'Alex Johnson', memberId: 'M-201', grade: '11th Grade', email: 'alex.j@ktmv.edu', phone: '(555) 304-1290' },
+                    { name: 'Emily Davis', memberId: 'M-202', grade: '12th Grade', email: 'emily.d@ktmv.edu', phone: '(555) 492-4820' },
+                    { name: 'Marcus Vance', memberId: 'M-203', grade: '10th Grade', email: 'marcus.v@ktmv.edu', phone: '(555) 901-2034' },
+                    { name: 'Sophia Patel', memberId: 'M-204', grade: '12th Grade', email: 'sophia.p@ktmv.edu', phone: '(555) 234-8890' }
+                ];
+
+                // Seed some borrows:
+                // Let's create dates: today, 10 days ago, 20 days ago (will be overdue)
+                const todayStr = this.getLocalDateString(0);
+                const tenDaysAgo = this.getLocalDateString(-10);
+                const sixDaysAgo = this.getLocalDateString(-6);
+                const fourDaysAhead = this.getLocalDateString(4);
+                
+                const twentyDaysAgo = this.getLocalDateString(-20);
+                const sixDaysAgoOverdue = this.getLocalDateString(-6); // Due date was 6 days ago!
+
+                this.borrows = [
+                    {
+                        id: 'TX-101',
+                        memberId: 'M-201',
+                        memberName: 'Alex Johnson',
+                        bookIsbn: '978-0743273565',
+                        bookTitle: 'The Great Gatsby',
+                        issueDate: tenDaysAgo,
+                        dueDate: fourDaysAhead,
+                        status: 'BORROWED' // Active loan
+                    },
+                    {
+                        id: 'TX-102',
+                        memberId: 'M-202',
+                        memberName: 'Emily Davis',
+                        bookIsbn: '978-0553380163',
+                        bookTitle: 'A Brief History of Time',
+                        issueDate: tenDaysAgo,
+                        dueDate: fourDaysAhead,
+                        status: 'BORROWED' // Active loan
+                    },
+                    {
+                        id: 'TX-103',
+                        memberId: 'M-203',
+                        memberName: 'Marcus Vance',
+                        bookIsbn: '978-0446310789',
+                        bookTitle: 'To Kill a Mockingbird',
+                        issueDate: twentyDaysAgo,
+                        dueDate: sixDaysAgoOverdue,
+                        status: 'BORROWED' // Overdue!
+                    }
+                ];
+
+                this.activities = [
+                    { text: 'System seeded with default academic database.', time: 'System Initialization', type: 'system' },
+                    { text: 'Marcus Vance borrowed "To Kill a Mockingbird"', time: '20 days ago', type: 'borrow' },
+                    { text: 'Alex Johnson borrowed "The Great Gatsby"', time: '10 days ago', type: 'borrow' },
+                    { text: 'Emily Davis borrowed "A Brief History of Time"', time: '10 days ago', type: 'borrow' }
+                ];
+
+                this.saveAll();
+            }
+
+            getLocalDateString(offsetDays) {
+                const date = new Date();
+                date.setDate(date.getDate() + offsetDays);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            saveAll() {
+                localStorage.setItem('library_books', JSON.stringify(this.books));
+                localStorage.setItem('library_members', JSON.stringify(this.members));
+                localStorage.setItem('library_borrows', JSON.stringify(this.borrows));
+                localStorage.setItem('library_activities', JSON.stringify(this.activities));
+            }
+
+            // Toast notifications
+            showToast(type, message) {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'flex items-center gap-3 bg-slate-800 text-white px-4 py-3 rounded-2xl shadow-xl pointer-events-auto border border-slate-700 max-w-sm transition-all duration-300 translate-x-10 opacity-0';
+                
+                let icon = 'info';
+                let iconColor = 'text-indigo-400';
+                if (type === 'success') {
+                    icon = 'check-circle-2';
+                    iconColor = 'text-emerald-400';
+                } else if (type === 'error') {
+                    icon = 'alert-triangle';
+                    iconColor = 'text-rose-400';
+                }
+
+                toast.innerHTML = `
+                    <div class="${iconColor}">
+                        <i data-lucide="${icon}" class="w-5 h-5"></i>
+                    </div>
+                    <p class="text-xs font-semibold flex-1 pr-2">${message}</p>
+                    <button class="text-slate-400 hover:text-white transition-colors" onclick="this.parentElement.remove()">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                `;
+
+                container.appendChild(toast);
+                lucide.createIcons();
+
+                // Trigger animations
+                setTimeout(() => {
+                    toast.classList.remove('translate-x-10', 'opacity-0');
+                }, 50);
+
+                // Auto destroy
+                setTimeout(() => {
+                    toast.classList.add('translate-x-10', 'opacity-0');
+                    setTimeout(() => { toast.remove(); }, 300);
+                }, 4000);
+            }
+
+            // Utilities
+            showCredentialsTip() {
+                this.showToast('info', 'Credentials: KTMV & password admin123. Input fields preset is at card bottom.');
+            }
+
+            togglePasswordVisibility(id, btn) {
+                const input = document.getElementById(id);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.innerHTML = `<i data-lucide="eye-off" class="w-4.5 h-4.5"></i>`;
+                } else {
+                    input.type = 'password';
+                    btn.innerHTML = `<i data-lucide="eye" class="w-4.5 h-4.5"></i>`;
+                }
+                lucide.createIcons();
+            }
+
+            toggleSidebar() {
+                const sidebar = document.getElementById('mobile-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
+            }
+
+            // Authentication logic
+            handleLogin(e) {
+                e.preventDefault();
+                const idInput = document.getElementById('login-id').value.trim();
+                const pwInput = document.getElementById('login-password').value;
+                const rememberMe = document.getElementById('remember-me').checked;
+
+                if (idInput === this.adminCredentials.id && pwInput === this.adminCredentials.pw) {
+                    this.isLoggedIn = true;
+                    if (rememberMe) {
+                        localStorage.setItem('library_admin_session', 'true');
+                    } else {
+                        localStorage.removeItem('library_admin_session');
+                    }
+
+                    // Visual transitions
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-workspace').classList.remove('hidden');
+                    
+                    this.switchTab('dashboard');
+                    this.showToast('success', 'Access Authorized. Welcome to KTMV Administration Panel.');
+
+                    // Reset login fields
+                    document.getElementById('login-id').value = '';
+                    document.getElementById('login-password').value = '';
+                } else {
+                    this.showToast('error', 'Authentication Failed! Please inspect Admin ID or Password.');
+                }
+            }
+
+            handleLogout() {
+                this.isLoggedIn = false;
+                localStorage.removeItem('library_admin_session');
+                
+                document.getElementById('app-workspace').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+                this.showToast('info', 'Logged out successfully.');
+                lucide.createIcons();
+            }
+
+            // Tab navigation engine
+            switchTab(tabId) {
+                this.currentTab = tabId;
+                
+                // Hide all tabs
+                document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+                
+                // Remove active classes from navigation anchors
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/10');
+                    link.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/60');
+                });
+
+                // Show active tab
+                const targetView = document.getElementById(`tab-${tabId}`);
+                if (targetView) targetView.classList.remove('hidden');
+
+                // Apply active class to navigation anchors
+                const targetNav = document.getElementById(`nav-${tabId}`);
+                if (targetNav) {
+                    targetNav.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/60');
+                    targetNav.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/10');
+                }
+
+                // Update Header Title
+                const titles = {
+                    dashboard: 'Dashboard Overview',
+                    books: 'Book Inventory Management',
+                    members: 'Member Registry Directory',
+                    borrow: 'Book Circulations (Borrow / Return)'
+                };
+                document.getElementById('header-title').textContent = titles[tabId] || 'Library Management';
+
+                // Specific page initializations
+                if (tabId === 'dashboard') {
+                    this.renderDashboardStats();
+                    this.renderRecentActivities();
+                } else if (tabId === 'books') {
+                    this.renderBooksTable();
+                } else if (tabId === 'members') {
+                    this.renderMembersTable();
+                } else if (tabId === 'borrow') {
+                    this.prepareBorrowDropdowns();
+                    this.renderBorrowTable();
+                }
+
+                // On mobile, automatically close sidebar after click
+                const sidebar = document.getElementById('mobile-sidebar');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    this.toggleSidebar();
+                }
+
+                lucide.createIcons();
+            }
+
+            // ==========================================
+            // BUSINESS LOGIC: DASHBOARD
+            // ==========================================
+            renderDashboardStats() {
+                // Stat calculations
+                const totalBooks = this.books.reduce((acc, bk) => acc + parseInt(bk.totalStock || 0), 0);
+                const totalMembers = this.members.length;
+                
+                // Active borrows are borrowing records that have a status of BORROWED
+                const activeBorrows = this.borrows.filter(b => b.status === 'BORROWED');
+                const totalBorrowed = activeBorrows.length;
+
+                // Check for Overdues: Status is borrowed and due date is strictly in the past
+                const todayStr = this.getLocalDateString(0);
+                const overdueBorrows = activeBorrows.filter(b => b.dueDate < todayStr);
+                const totalOverdue = overdueBorrows.length;
+
+                // Set numbers
+                document.getElementById('stat-total-books').textContent = totalBooks;
+                document.getElementById('stat-total-members').textContent = totalMembers;
+                document.getElementById('stat-total-borrowed').textContent = totalBorrowed;
+                document.getElementById('stat-total-overdue').textContent = totalOverdue;
+
+                // Set status cues
+                if (totalOverdue > 0) {
+                    document.getElementById('stat-total-overdue').classList.add('text-rose-600');
+                    document.getElementById('stat-overdue-subtitle').innerHTML = `<i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-500"></i> ${totalOverdue} requires urgent return`;
+                } else {
+                    document.getElementById('stat-total-overdue').classList.remove('text-rose-600');
+                    document.getElementById('stat-overdue-subtitle').innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> All clean. No overdues!`;
+                }
+
+                // Utilization meter calculations
+                const availableBooks = this.books.reduce((acc, bk) => acc + parseInt(bk.availableStock || 0), 0);
+                document.getElementById('stock-utilization-text').textContent = `${availableBooks} of ${totalBooks} copies in shelf`;
+                const percentage = totalBooks > 0 ? (availableBooks / totalBooks) * 100 : 0;
+                document.getElementById('stock-utilization-bar').style.width = `${percentage}%`;
+            }
+
+            renderRecentActivities() {
+                const listEl = document.getElementById('recent-activities-list');
+                listEl.innerHTML = '';
+
+                if (this.activities.length === 0) {
+                    listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">No activity recorded yet.</div>`;
+                    return;
+                }
+
+                // Show top 15 activities (reversed chronologically)
+                const shownActivities = [...this.activities].reverse().slice(0, 15);
+                
+                shownActivities.forEach(act => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-start gap-3.5 py-3';
+
+                    let colorBg = 'bg-slate-100 text-slate-500';
+                    let icon = 'info';
+
+                    if (act.type === 'borrow') {
+                        colorBg = 'bg-amber-50 text-amber-600';
+                        icon = 'book-up';
+                    } else if (act.type === 'return') {
+                        colorBg = 'bg-emerald-50 text-emerald-600';
+                        icon = 'book-down';
+                    } else if (act.type === 'member') {
+                        colorBg = 'bg-violet-50 text-violet-600';
+                        icon = 'user-plus';
+                    } else if (act.type === 'book') {
+                        colorBg = 'bg-indigo-50 text-indigo-600';
+                        icon = 'plus-circle';
+                    }
+
+                    item.innerHTML = `
+                        <div class="w-9 h-9 rounded-xl ${colorBg} flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="${icon}" class="w-4.5 h-4.5"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-slate-700 leading-normal">${act.text}</p>
+                            <span class="text-[10px] text-slate-400 font-medium">${act.time}</span>
+                        </div>
+                    `;
+                    listEl.appendChild(item);
+                });
+                lucide.createIcons();
+            }
+
+            addActivity(text, type) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' today';
+                this.activities.push({ text, time: timeStr, type });
+                this.saveAll();
+            }
+
+            // Quick actions from dashboard
+            openAddBookQuickly() {
+                this.switchTab('books');
+                document.getElementById('book-title').focus();
+            }
+
+            openRegisterMemberQuickly() {
+                this.switchTab('members');
+                document.getElementById('member-name').focus();
+            }
+
+
+            // ==========================================
+            // BUSINESS LOGIC: BOOK MANAGEMENT
+            // ==========================================
+            renderBooksTable() {
+                const searchVal = document.getElementById('book-search').value.toLowerCase().trim();
+                const categoryFilter = document.getElementById('book-filter-category').value;
+                const tbody = document.getElementById('books-table-body');
+                tbody.innerHTML = '';
+
+                let filteredBooks = this.books;
+
+                // Category filter
+                if (categoryFilter !== 'ALL') {
+                    filteredBooks = filteredBooks.filter(bk => bk.category === categoryFilter);
+                }
+
+                // Text search
+                if (searchVal) {
+                    filteredBooks = filteredBooks.filter(bk => 
+                        bk.title.toLowerCase().includes(searchVal) || 
+                        bk.author.toLowerCase().includes(searchVal) || 
+                        bk.isbn.toLowerCase().includes(searchVal)
+                    );
+                }
+
+                if (filteredBooks.length === 0) {
+                    document.getElementById('books-table-empty').classList.remove('hidden');
+                } else {
+                    document.getElementById('books-table-empty').classList.add('hidden');
+                }
+
+                filteredBooks.forEach((bk, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50/50 transition-colors group';
+
+                    const total = parseInt(bk.totalStock || 0);
+                    const avail = parseInt(bk.availableStock || 0);
+                    
+                    let stockBadge = '';
+                    if (avail === 0) {
+                        stockBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">Out of Stock (${avail}/${total})</span>`;
+                    } else if (avail < total) {
+                        stockBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100">Issued (${avail}/${total} left)</span>`;
+                    } else {
+                        stockBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Available (${avail}/${total})</span>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex flex-col justify-between p-1.5 text-white shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
+                                    <span class="text-[8px] font-extrabold uppercase tracking-tight opacity-75 truncate">${bk.category}</span>
+                                    <i data-lucide="book" class="w-4 h-4 mx-auto"></i>
+                                    <span class="text-[8px] font-bold text-center truncate">${bk.shelf}</span>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-bold text-slate-800 leading-snug truncate">${bk.title}</h4>
+                                    <p class="text-xs text-slate-400 font-semibold truncate">by ${bk.author}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md select-all">${bk.isbn}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">${bk.category}</span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            ${stockBadge}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button onclick="app.editBook(${index})" title="Edit Book" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="app.deleteBook(${index})" title="Delete Book" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-colors">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                lucide.createIcons();
+            }
+
+            handleBookSubmit(e) {
+                e.preventDefault();
+                
+                const editIdx = parseInt(document.getElementById('book-edit-index').value);
+                const title = document.getElementById('book-title').value.trim();
+                const author = document.getElementById('book-author').value.trim();
+                const isbn = document.getElementById('book-isbn').value.trim();
+                const category = document.getElementById('book-category').value;
+                const totalStock = parseInt(document.getElementById('book-stock').value);
+                const shelf = document.getElementById('book-shelf').value.trim() || 'A-1';
+
+                // Check ISBN unique (only when creating, or editing someone else)
+                const isIsbnTaken = this.books.some((b, i) => b.isbn.toLowerCase() === isbn.toLowerCase() && i !== editIdx);
+                if (isIsbnTaken) {
+                    this.showToast('error', `A book with ISBN ${isbn} already exists in the inventory!`);
+                    return;
+                }
+
+                if (editIdx === -1) {
+                    // Create New Book
+                    const newBook = {
+                        title,
+                        author,
+                        isbn,
+                        category,
+                        totalStock,
+                        availableStock: totalStock, // available matches stock when catalogued
+                        shelf
+                    };
+                    this.books.push(newBook);
+                    this.addActivity(`Cataloged new book: "${title}"`, 'book');
+                    this.showToast('success', `"${title}" cataloged successfully!`);
+                } else {
+                    // Edit Existing
+                    const book = this.books[editIdx];
+                    const difference = totalStock - book.totalStock;
+                    
+                    book.title = title;
+                    book.author = author;
+                    book.isbn = isbn;
+                    book.category = category;
+                    book.totalStock = totalStock;
+                    
+                    // Adjust available stock safely
+                    book.availableStock = Math.max(0, parseInt(book.availableStock || 0) + difference);
+                    book.shelf = shelf;
+
+                    this.addActivity(`Updated catalog entry: "${title}"`, 'book');
+                    this.showToast('success', `"${title}" updated successfully!`);
+                }
+
+                this.saveAll();
+                this.resetBookForm();
+                this.renderBooksTable();
+            }
+
+            editBook(index) {
+                const bk = this.books[index];
+                
+                document.getElementById('book-edit-index').value = index;
+                document.getElementById('book-title').value = bk.title;
+                document.getElementById('book-author').value = bk.author;
+                document.getElementById('book-isbn').value = bk.isbn;
+                document.getElementById('book-category').value = bk.category;
+                document.getElementById('book-stock').value = bk.totalStock;
+                document.getElementById('book-shelf').value = bk.shelf;
+
+                // Toggle labels and display cancel button
+                document.getElementById('book-form-title').textContent = 'Modify Book Details';
+                document.getElementById('book-btn-submit').textContent = 'Update Book';
+                document.getElementById('book-btn-cancel').classList.remove('hidden');
+
+                document.getElementById('book-title').focus();
+            }
+
+            deleteBook(index) {
+                const bk = this.books[index];
+                
+                // Confirm book has no active loans
+                const hasActiveLoans = this.borrows.some(b => b.bookIsbn === bk.isbn && b.status === 'BORROWED');
+                if (hasActiveLoans) {
+                    this.showToast('error', `Cannot delete "${bk.title}". Active loans exist for this book!`);
+                    return;
+                }
+
+                if (confirm(`Are you sure you want to delete "${bk.title}" from the registry?`)) {
+                    this.books.splice(index, 1);
+                    this.addActivity(`Deleted catalog entry: "${bk.title}"`, 'book');
+                    this.saveAll();
+                    this.renderBooksTable();
+                    this.showToast('success', `Book successfully removed.`);
+                }
+            }
+
+            resetBookForm() {
+                document.getElementById('book-form').reset();
+                document.getElementById('book-edit-index').value = '-1';
+                
+                document.getElementById('book-form-title').textContent = 'Catalog New Book';
+                document.getElementById('book-btn-submit').textContent = 'Save Book';
+                document.getElementById('book-btn-cancel').classList.add('hidden');
+            }
+
+
+            // ==========================================
+            // BUSINESS LOGIC: MEMBER REGISTRY
+            // ==========================================
+            renderMembersTable() {
+                const searchVal = document.getElementById('member-search').value.toLowerCase().trim();
+                const tbody = document.getElementById('members-table-body');
+                tbody.innerHTML = '';
+
+                let filteredMembers = this.members;
+
+                if (searchVal) {
+                    filteredMembers = filteredMembers.filter(m => 
+                        m.name.toLowerCase().includes(searchVal) || 
+                        m.memberId.toLowerCase().includes(searchVal) || 
+                        m.email.toLowerCase().includes(searchVal)
+                    );
+                }
+
+                if (filteredMembers.length === 0) {
+                    document.getElementById('members-table-empty').classList.remove('hidden');
+                } else {
+                    document.getElementById('members-table-empty').classList.add('hidden');
+                }
+
+                filteredMembers.forEach((m, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50/50 transition-colors group';
+
+                    // Calculate active borrows count for this reader
+                    const activeLoans = this.borrows.filter(b => b.memberId === m.memberId && b.status === 'BORROWED').length;
+                    
+                    let activeLoansBadge = '';
+                    if (activeLoans > 0) {
+                        activeLoansBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold bg-amber-100 text-amber-700 ring-4 ring-amber-50">${activeLoans}</span>`;
+                    } else {
+                        activeLoansBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold text-slate-400 bg-slate-100">0</span>`;
+                    }
+
+                    // Simple color palette index for avatar
+                    const colors = [
+                        'from-indigo-400 to-indigo-500',
+                        'from-violet-400 to-violet-500',
+                        'from-emerald-400 to-teal-500',
+                        'from-sky-400 to-blue-500'
+                    ];
+                    const gradient = colors[index % colors.length];
+                    const initials = m.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+                    tr.innerHTML = `
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center font-bold text-white text-xs shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
+                                    ${initials}
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-bold text-slate-800 leading-snug truncate">${m.name}</h4>
+                                    <p class="text-xs text-slate-400 font-semibold truncate">${m.email}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-md">${m.memberId}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-xs font-semibold text-slate-600">${m.grade}</span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            ${activeLoansBadge}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button onclick="app.editMember(${index})" title="Edit Member" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="app.deleteMember(${index})" title="Delete Member" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-colors">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                lucide.createIcons();
+            }
+
+            handleMemberSubmit(e) {
+                e.preventDefault();
+
+                const editIdx = parseInt(document.getElementById('member-edit-index').value);
+                const name = document.getElementById('member-name').value.trim();
+                const memberId = document.getElementById('member-id').value.toUpperCase().trim();
+                const grade = document.getElementById('member-class').value.trim();
+                const email = document.getElementById('member-email').value.trim();
+                const phone = document.getElementById('member-phone').value.trim();
+
+                // Check unique member ID (only when creating, or editing someone else)
+                const isIdTaken = this.members.some((m, i) => m.memberId === memberId && i !== editIdx);
+                if (isIdTaken) {
+                    this.showToast('error', `A member with ID ${memberId} is already registered!`);
+                    return;
+                }
+
+                if (editIdx === -1) {
+                    // Create New Member
+                    const newMember = { name, memberId, grade, email, phone };
+                    this.members.push(newMember);
+                    this.addActivity(`Registered member: "${name}" (${memberId})`, 'member');
+                    this.showToast('success', `Member "${name}" successfully registered!`);
+                } else {
+                    // Edit Existing
+                    const originalId = this.members[editIdx].memberId;
+                    this.members[editIdx] = { name, memberId, grade, email, phone };
+                    
+                    // Propagate Member ID changes inside Borrows database if they changed ID
+                    if (originalId !== memberId) {
+                        this.borrows.forEach(b => {
+                            if (b.memberId === originalId) {
+                                b.memberId = memberId;
+                                b.memberName = name;
+                            }
+                        });
+                    } else {
+                        // Just update name
+                        this.borrows.forEach(b => {
+                            if (b.memberId === memberId) {
+                                b.memberName = name;
+                            }
+                        });
+                    }
+
+                    this.addActivity(`Updated profile: "${name}" (${memberId})`, 'member');
+                    this.showToast('success', `Member details updated successfully.`);
+                }
+
+                this.saveAll();
+                this.resetMemberForm();
+                this.renderMembersTable();
+            }
+
+            editMember(index) {
+                const m = this.members[index];
+
+                document.getElementById('member-edit-index').value = index;
+                document.getElementById('member-name').value = m.name;
+                document.getElementById('member-id').value = m.memberId;
+                document.getElementById('member-class').value = m.grade;
+                document.getElementById('member-email').value = m.email;
+                document.getElementById('member-phone').value = m.phone;
+
+                document.getElementById('member-form-title').textContent = 'Modify Member Info';
+                document.getElementById('member-btn-submit').textContent = 'Update Member';
+                document.getElementById('member-btn-cancel').classList.remove('hidden');
+
+                document.getElementById('member-name').focus();
+            }
+
+            deleteMember(index) {
+                const m = this.members[index];
+
+                // Check active loans
+                const hasActiveLoans = this.borrows.some(b => b.memberId === m.memberId && b.status === 'BORROWED');
+                if (hasActiveLoans) {
+                    this.showToast('error', `Cannot delete member "${m.name}". They have outstanding borrowed books!`);
+                    return;
+                }
+
+                if (confirm(`Remove member "${m.name}" (${m.memberId}) from registry?`)) {
+                    this.members.splice(index, 1);
+                    this.addActivity(`Removed member: "${m.name}"`, 'member');
+                    this.saveAll();
+                    this.renderMembersTable();
+                    this.showToast('success', `Member deleted successfully.`);
+                }
+            }
+
+            resetMemberForm() {
+                document.getElementById('member-form').reset();
+                document.getElementById('member-edit-index').value = '-1';
+
+                document.getElementById('member-form-title').textContent = 'Register Member';
+                document.getElementById('member-btn-submit').textContent = 'Register Member';
+                document.getElementById('member-btn-cancel').classList.add('hidden');
+            }
+
+
+            // ==========================================
+            // BUSINESS LOGIC: BORROW & RETURN
+            // ==========================================
+            prepareBorrowDropdowns() {
+                // Member dropdown
+                const mSelect = document.getElementById('borrow-member-id');
+                mSelect.innerHTML = '<option value="" disabled selected>Select a registered member</option>';
+                this.members.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.memberId;
+                    opt.textContent = `${m.name} (${m.memberId})`;
+                    mSelect.appendChild(opt);
+                });
+
+                // Book dropdown (Only books that have availableStock > 0)
+                const bSelect = document.getElementById('borrow-book-isbn');
+                bSelect.innerHTML = '<option value="" disabled selected>Select an available book</option>';
+                this.books.forEach(b => {
+                    const avail = parseInt(b.availableStock || 0);
+                    const opt = document.createElement('option');
+                    opt.value = b.isbn;
+                    opt.textContent = `${b.title} [ISBN: ${b.isbn}] (${avail} left)`;
+                    if (avail === 0) {
+                        opt.disabled = true;
+                        opt.textContent += ' [OUT OF STOCK]';
+                    }
+                    bSelect.appendChild(opt);
+                });
+
+                // Default Dates
+                const today = new Date();
+                const due = new Date();
+                due.setDate(due.getDate() + 14); // 2 weeks default
+
+                const formatDate = (d) => {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${day}`;
+                };
+
+                document.getElementById('borrow-date').value = formatDate(today);
+                document.getElementById('borrow-due-date').value = formatDate(due);
+            }
+
+            renderBorrowTable() {
+                const searchVal = document.getElementById('borrow-search').value.toLowerCase().trim();
+                const statusFilter = document.getElementById('borrow-filter-status').value;
+                const tbody = document.getElementById('borrow-table-body');
+                tbody.innerHTML = '';
+
+                let filteredBorrows = this.borrows;
+
+                // Status Filter
+                const todayStr = this.getLocalDateString(0);
+                if (statusFilter === 'BORROWED') {
+                    // Only active loans that are NOT overdue
+                    filteredBorrows = filteredBorrows.filter(b => b.status === 'BORROWED' && b.dueDate >= todayStr);
+                } else if (statusFilter === 'RETURNED') {
+                    filteredBorrows = filteredBorrows.filter(b => b.status === 'RETURNED');
+                } else if (statusFilter === 'OVERDUE') {
+                    filteredBorrows = filteredBorrows.filter(b => b.status === 'BORROWED' && b.dueDate < todayStr);
+                }
+
+                // Text Search
+                if (searchVal) {
+                    filteredBorrows = filteredBorrows.filter(b => 
+                        b.memberName.toLowerCase().includes(searchVal) || 
+                        b.memberId.toLowerCase().includes(searchVal) || 
+                        b.bookTitle.toLowerCase().includes(searchVal) || 
+                        b.id.toLowerCase().includes(searchVal)
+                    );
+                }
+
+                if (filteredBorrows.length === 0) {
+                    document.getElementById('borrow-table-empty').classList.remove('hidden');
+                } else {
+                    document.getElementById('borrow-table-empty').classList.add('hidden');
+                }
+
+                // Reverse array to show recent transactions first
+                [...filteredBorrows].reverse().forEach(b => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50/50 transition-colors group';
+
+                    let statusBadge = '';
+                    let actionBtn = '';
+
+                    const isOverdue = b.dueDate < todayStr && b.status === 'BORROWED';
+
+                    if (b.status === 'RETURNED') {
+                        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Returned</span>`;
+                        actionBtn = `<span class="text-xs text-slate-400 font-medium italic pr-2">Fully Closed</span>`;
+                    } else if (isOverdue) {
+                        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">Overdue Alert</span>`;
+                        actionBtn = `
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button onclick="app.returnBook('${b.id}')" title="Return Book" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                                    Return
+                                </button>
+                                <button onclick="app.extendLoan('${b.id}')" title="Extend loan" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors">
+                                    <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100 font-medium">Lent Out</span>`;
+                        actionBtn = `
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button onclick="app.returnBook('${b.id}')" title="Return Book" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                                    Return
+                                </button>
+                                <button onclick="app.extendLoan('${b.id}')" title="Extend loan" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors">
+                                    <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    // Format dates beautiful
+                    const formatPrettyDate = (dStr) => {
+                        const d = new Date(dStr + 'T00:00:00'); // append timezone fix
+                        return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+                    };
+
+                    tr.innerHTML = `
+                        <td class="py-3 px-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 leading-snug">${b.bookTitle}</h4>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mt-0.5">ISBN: ${b.bookIsbn}</p>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 leading-snug">${b.memberName}</h4>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mt-0.5">ID: ${b.memberId}</p>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="text-xs">
+                                <span class="font-semibold text-slate-500 block">Out: ${formatPrettyDate(b.issueDate)}</span>
+                                <span class="font-bold ${isOverdue ? 'text-rose-600' : 'text-slate-600'} block">Due: ${formatPrettyDate(b.dueDate)}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            ${statusBadge}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            ${actionBtn}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                lucide.createIcons();
+            }
+
+            handleBorrowSubmit(e) {
+                e.preventDefault();
+
+                const memberId = document.getElementById('borrow-member-id').value;
+                const isbn = document.getElementById('borrow-book-isbn').value;
+                const issueDate = document.getElementById('borrow-date').value;
+                const dueDate = document.getElementById('borrow-due-date').value;
+
+                if (issueDate > dueDate) {
+                    this.showToast('error', 'Loan issue date cannot fall ahead of the returns due date!');
+                    return;
+                }
+
+                // Check reader active loans count limits (e.g. max 5 books lent out)
+                const readerLoans = this.borrows.filter(b => b.memberId === memberId && b.status === 'BORROWED').length;
+                if (readerLoans >= 5) {
+                    this.showToast('error', 'Loan request blocked. Reader already has 5 active outstanding books.');
+                    return;
+                }
+
+                // Grab models
+                const member = this.members.find(m => m.memberId === memberId);
+                const book = this.books.find(b => b.isbn === isbn);
+
+                if (!member) {
+                    this.showToast('error', 'Member registry entry not found.');
+                    return;
+                }
+                if (!book || parseInt(book.availableStock || 0) <= 0) {
+                    this.showToast('error', 'Book is out of inventory.');
+                    return;
+                }
+
+                // Issue process
+                const transactionId = `TX-${Date.now().toString().slice(-6)}`;
+                const record = {
+                    id: transactionId,
+                    memberId: member.memberId,
+                    memberName: member.name,
+                    bookIsbn: book.isbn,
+                    bookTitle: book.title,
+                    issueDate,
+                    dueDate,
+                    status: 'BORROWED'
+                };
+
+                // Deduct stock
+                book.availableStock = Math.max(0, parseInt(book.availableStock || 0) - 1);
+                
+                this.borrows.push(record);
+                this.addActivity(`${member.name} borrowed "${book.title}"`, 'borrow');
+                
+                this.saveAll();
+                this.showToast('success', `Transaction Registered. ID: ${transactionId}`);
+                
+                // Refresh views
+                this.prepareBorrowDropdowns();
+                this.renderBorrowTable();
+            }
+
+            returnBook(transactionId) {
+                const record = this.borrows.find(b => b.id === transactionId);
+                if (!record) {
+                    this.showToast('error', 'Circulation record not found.');
+                    return;
+                }
+
+                const book = this.books.find(b => b.isbn === record.bookIsbn);
+                if (book) {
+                    // Increase stock safely
+                    book.availableStock = Math.min(book.totalStock, parseInt(book.availableStock || 0) + 1);
+                }
+
+                record.status = 'RETURNED';
+                
+                this.addActivity(`${record.memberName} returned "${record.bookTitle}"`, 'return');
+                this.saveAll();
+                this.showToast('success', 'Book returned & stock reinstated in library catalog!');
+
+                // Refresh views
+                this.renderBorrowTable();
+            }
+
+            extendLoan(transactionId) {
+                const record = this.borrows.find(b => b.id === transactionId);
+                if (!record) return;
+
+                // Extend due date by 7 days
+                const curDue = new Date(record.dueDate + 'T00:00:00');
+                curDue.setDate(curDue.getDate() + 7);
+
+                const y = curDue.getFullYear();
+                const m = String(curDue.getMonth() + 1).padStart(2, '0');
+                const d = String(curDue.getDate()).padStart(2, '0');
+
+                record.dueDate = `${y}-${m}-${d}`;
+
+                this.addActivity(`Loan extended 7 days for "${record.bookTitle}" (${record.memberName})`, 'system');
+                this.saveAll();
+                this.showToast('success', 'Loan extended 7 days!');
+
+                this.renderBorrowTable();
+            }
+
+        }
+
+        // Boot system on global context
+        const app = new LibrarySystem();
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
